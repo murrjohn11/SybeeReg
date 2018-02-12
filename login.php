@@ -1,6 +1,9 @@
 <?php
 	include 'sql.php';
 	$idnum = $_POST['idnum'];
-	if(strlen($idnum)>0&&$SQL->signin($idnum)){
-		echo "Success";
+	if($SQL->validateID($idnum)){
+		if(!$SQL->isSignedIn($idnum)){
+			 $SQL->signin($idnum);
+			 echo "Success";
+		}else echo "Already Logged In";
 	}else echo "Fail";

@@ -4,18 +4,30 @@
 	class SQL{
 		private $conn;
 		public function __construct(){
-			$this->conn = new mysqli("localhost","root","Codeusctc","sybeer");
+			$this->conn = mysqli_connect("localhost","root","Codeusctc","sybeer");
+		}
+		public function validateID($idnum){
+			$sql = "SELECT * FROM registration WHERE idnum='".$idnum."'";
+			$query = mysqli_query($this->conn,$sql);
+			if(mysqli_num_rows($query)>0) return true;
+			else return false;
+		}
+		public function isSignedIn($idnum){
+			$sql = "SELECT * FROM registration WHERE idnum='".$idnum."' AND timein!=' '";
+			$query = mysqli_query($this->conn,$sql);
+			if(mysqli_num_rows($query)>0) return true;
+			else return false;
 		}
 		public function signin($idnum){
 			$now = new DateTime();
-			$time = $now->format('H:i:s A');
+			$time = $now->format('G:i:s A');
 			$sql = "UPDATE registration SET timein='".$time."' WHERE idnum='".$idnum."'";
+			$count = 0;
 			$query = mysqli_query($this->conn,$sql);
-			if($query) return true;
-			else return false;
+			if(!$query) echo mysqli_error($this->conn);
 		}
 		public function retrieveTimeIns(){
-			$sql = "SELECT * FROM registration WHERE timein !=' ' ORDER BY courseyr ASC";
+			$sql = "SELECT * FROM registration ORDER BY courseyr,idnum ASC";
 			$query = mysqli_query($this->conn,$sql);
 			if($query){
 				$itemArray = [];
