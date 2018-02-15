@@ -10,6 +10,7 @@
 
 	include 'sql.php';
 
+	$course = $_GET['course'];
 	$page = $_GET['page'];
 
 	$options = new Options();
@@ -17,24 +18,25 @@
 
 	$html = file_get_contents('table.html');
 	
-	$count = 1;
-	$students = $SQL->retrieveTimeins();
+	$count = ($page-1)*25;
+	$students = $SQL->retrieveTimeins($course);
 	foreach($students as $student){
-		if($count > ($page - 1)*41 && $count <= $page*41){
+		if($count<25){
 			$html = $html."<tr>"."<td class='td1'>".
 				$count."</td><td class='td1'>".
 				$student['idnum']."</td><td class='td1'>".
 				$student['name']."</td><td class='td1'>".
-				$student['courseyr']."</td><td class='td1'>".
+				$student['courseyr']."-".$student['year']."</td><td class='td1'>".
 				$student['timein']."</td></tr>";
 		}
 		$count++;
 	}
+	// $SQL->updateTable();
 
 	$html = $html."</table></center></body></html>";
 
 	$dompdf = new Dompdf($options);
 	$dompdf->loadHtml($html);
-	$dompdf->setPaper('Letter','landscape');
+	$dompdf->setPaper('Letter','portrait');
 	$dompdf->render();
 	$dompdf->stream("USC BA Convention 2018.pdf",array("Attachment" => false));
